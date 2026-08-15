@@ -1,0 +1,110 @@
+local Player = game.Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+-- สร้างหน้าจอหลัก
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ปรับแต่งรถ"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = PlayerGui
+
+-- เมนูหลัก
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 250)
+MainFrame.Position = UDim2.new(0.02, 0, 0.5, -125)
+MainFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 40)
+MainFrame.ClipsDescendants = true
+MainFrame.Parent = ScreenGui
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+
+-- แถบหัวเมนู + ปุ่มย่อ
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 45)
+TopBar.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
+TopBar.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(0.8, 0, 1, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "🚗 ปรับแต่งรถ Drive Simulator"
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Font = Enum.Font.GothamBold
+Title.TextScaled = true
+Title.Parent = TopBar
+
+local MinBtn = Instance.new("TextButton")
+MinBtn.Size = UDim2.new(0, 35, 0, 35)
+MinBtn.Position = UDim2.new(1, -40, 0, 5)
+MinBtn.BackgroundColor3 = Color3.fromRGB(80, 150, 255)
+MinBtn.Text = "−"
+MinBtn.TextColor3 = Color3.new(1, 1, 1)
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.TextScaled = true
+MinBtn.Parent = TopBar
+Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 8)
+
+-- ฟังก์ชันสร้างปุ่มเมนู
+local function CreateButton(name, yPos, color)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.9, 0, 0, 42)
+    btn.Position = UDim2.new(0.05, 0, 0, yPos)
+    btn.BackgroundColor3 = color
+    btn.Text = name
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.Gotham
+    btn.TextScaled = true
+    btn.Parent = MainFrame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 7)
+    return btn
+end
+
+local SpeedBtn = CreateButton("⚡ ปรับความเร็วรถ", 55, Color3.fromRGB(50, 130, 220))
+local TiltBtn = CreateButton("🔧 ปรับกราบ/มุมรถ", 105, Color3.fromRGB(50, 180, 120))
+local PartBtn = CreateButton("🧩 ถอด/ใส่ชิ้นส่วนรถ", 155, Color3.fromRGB(220, 150, 50))
+
+-- ฟังก์ชันย่อ-ขยายเมนู
+local IsMin = false
+MinBtn.MouseButton1Click:Connect(function()
+    IsMin = not IsMin
+    if IsMin then
+        MainFrame.Size = UDim2.new(0, 45, 0, 45)
+        MainFrame.Position = UDim2.new(0.02, 0, 0.9, -50)
+        Title.Visible = false
+        SpeedBtn.Visible = false
+        TiltBtn.Visible = false
+        PartBtn.Visible = false
+        MinBtn.Position = UDim2.new(0, 5, 0, 5)
+        MinBtn.Text = "+"
+    else
+        MainFrame.Size = UDim2.new(0, 300, 0, 250)
+        MainFrame.Position = UDim2.new(0.02, 0, 0.5, -125)
+        Title.Visible = true
+        SpeedBtn.Visible = true
+        TiltBtn.Visible = true
+        PartBtn.Visible = true
+        MinBtn.Position = UDim2.new(1, -40, 0, 5)
+        MinBtn.Text = "−"
+    end
+end)
+
+-- การทำงานของแต่ละปุ่ม
+SpeedBtn.MouseButton1Click:Connect(function()
+    local Veh = Player.Character and Player.Character:FindFirstChildWhichIsA("VehicleSeat")
+    if Veh then Veh.MaxSpeed = Veh.MaxSpeed * 1.5 end
+end)
+
+TiltBtn.MouseButton1Click:Connect(function()
+    local Veh = Player.Character and Player.Character:FindFirstChildWhichIsA("BasePart")
+    if Veh then Veh.CFrame *= CFrame.Angles(math.rad(-4), 0, 0) end
+end)
+
+PartBtn.MouseButton1Click:Connect(function()
+    local Char = Player.Character
+    if Char then
+        for _, v in pairs(Char:GetChildren()) do
+            if v:IsA("BasePart") and v.Name:match("ชิ้นส่วน|ตกแต่ง") then
+                v.Transparency = (v.Transparency == 0) and 1 or 0
+            end
+        end
+    end
+end)
